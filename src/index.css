@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  font-family: "Poppins", sans-serif;
+  font-weight: "normal";
+  background-color: #111827;
+  /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 800'%3E%3Cg fill-opacity='0.08'%3E%3Ccircle fill='%23111827' cx='400' cy='400' r='600'/%3E%3Ccircle fill='%2319202f' cx='400' cy='400' r='500'/%3E%3Ccircle fill='%23202838' cx='400' cy='400' r='400'/%3E%3Ccircle fill='%23283140' cx='400' cy='400' r='300'/%3E%3Ccircle fill='%232f3949' cx='400' cy='400' r='200'/%3E%3Ccircle fill='%23374151' cx='400' cy='400' r='100'/%3E%3C/g%3E%3C/svg%3E"); */
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* Style the scrollbar */
+::-webkit-scrollbar {
+  width: 6px; /* Width of the vertical scrollbar */
+  height: 6px; /* Height of the horizontal scrollbar */
+}
+
+/* Style the track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Background color of the track */
+  border-radius: 10px; /* Optional: Add some rounding */
+}
+
+/* Style the thumb */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Color of the scroll thumb */
+  border-radius: 10px; /* Optional: Add some rounding */
+}
+
+/* Style the thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color of the scroll thumb on hover */
+}
+
+.outlet-height {
+  max-height: 85vh;
+  overflow: auto;
+}
+
+.h-60vh {
+  height: 60vh;
+}
+.fr-box.fr-basic {
+  background-color: rgb(255 255 255 / 0.05);
+  border-radius: 0.375rem !important;
+}
+.fr-toolbar.fr-top {
+  border-radius: 0.375rem !important;
+  background-color: rgb(55 65 81 / 0.1) !important;
+  border-color: rgb(255 255 255 / 0.05) !important;
+}
+.fr-btn-grp button svg {
+  stroke: rgb(156 163 175 / 1) !important;
+}
+.fr-second-toolbar {
+  background-color: rgb(55 65 81 / 0.1) !important;
+  border-radius: 0.375rem !important;
+  border-color: rgb(255 255 255 / 0.05) !important;
+}
+.fr-newline {
+  background-color: rgb(255 255 255 / 0.05) !important;
+}
+
+.fr-box.fr-basic .fr-wrapper {
+  background-color: rgb(55 65 81 / 0.1) !important;
+  border-color: rgb(255 255 255 / 0.05) !important;
+}
+
+.fr-box.fr-basic .fr-element {
+  color: rgb(229 231 235) !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.h-50vh {
+  height: 50vh;
+}
+
+.h-65vh {
+  height: 65vh;
+}
+
+.h-70vh {
+  height: 70vh;
+}
+
+.max-h-65vh {
+  max-height: 65vh;
+}

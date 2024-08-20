@@ -1,0 +1,54 @@
+steps:
+  # Install dependencies
+  - name: "node:18"
+    entrypoint: "npm"
+    args: ["install"]
+
+  # Build the Vite app
+  - name: "node:18"
+    entrypoint: "npm"
+    args: ["run", "build"]
+
+  # Package the build output into a tarball
+  - name: "gcr.io/cloud-builders/tar"
+    args: ["czf", "/workspace/build.tar.gz", "-C", "dist", "."]
+
+  # Use nginx to serve the build output
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "run",
+        "--rm",
+        "-v",
+        "$(pwd):/workspace",
+        "-v",
+        "/workspace/build.tar.gz:/usr/share/nginx/html",
+        "nginx:alpine"
+      ]
+
+  # Build a Docker image that serves the build output using nginx
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/jijnas/jijnas-frontend", "."]
+
+  # Push the Docker image to Google Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/jijnas/jijnas-frontend"]
+
+  # Deploy the image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "run",
+        "deploy",
+        "jijnas-frontend",
+        "--image",
+        "gcr.io/jijnas/jijnas-frontend",
+        "--platform",
+        "managed",
+        "--region",
+        "asia-south1 ",
+        "--allow-unauthenticated"
+      ]
+
+images:
+  - "gcr.io/jijnas/jijnas-frontend"
