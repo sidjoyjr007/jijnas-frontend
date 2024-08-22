@@ -3,8 +3,8 @@ import axios from "axios";
 import { store } from "../state/store";
 
 const axiosInstance = axios.create({
-  // baseURL: "https://jijnas-backend-service-nvwmghbpda-el.a.run.app/",
-  baseURL: "http://localhost:8000/",
+  baseURL: "https://api.quiznex.com/",
+  // baseURL: "http://localhost:8000/",
 
   withCredentials: true
 });
@@ -12,7 +12,12 @@ const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    config.headers["Content-Type"] = "application/json";
+    if (config.data instanceof FormData) {
+      // Let the browser set Content-Type automatically
+      delete config.headers["Content-Type"];
+    } else {
+      config.headers["Content-Type"] = "application/json";
+    }
     return config;
   },
   (error) => {

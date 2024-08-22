@@ -1,13 +1,15 @@
-import { useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   TransitionChild
 } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import JijnasLogo from "../assets/logo.svg";
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -19,6 +21,8 @@ const SideNavigation = ({
   sidebarOpen = false,
   setSidebarOpen
 }) => {
+  const navigate = useNavigate();
+
   return (
     <>
       <Dialog
@@ -53,11 +57,14 @@ const SideNavigation = ({
             </TransitionChild>
             {/* Sidebar component, swap this element with another sidebar if you like */}
             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900/80 px-6 pb-2">
-              <div className="flex h-16 shrink-0 items-center">
+              <div
+                className="flex h-16 shrink-0 items-center mt-6 cursor-pointer"
+                onClick={() => navigate("/")}
+              >
                 <img
                   alt="Your Company"
                   src={JijnasLogo}
-                  className="h-8 w-auto"
+                  className="h-10 w-auto"
                 />
               </div>
               <nav className="flex flex-1 flex-col">
@@ -135,8 +142,13 @@ const SideNavigation = ({
       <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex grow flex-col gap-y-5 overflow-y-auto  border-r border-white/5  bg-gray-900/20 px-6">
-          <div className="flex h-16 shrink-0 items-center">
-            <img alt="Your Company" src={JijnasLogo} className="h-16 w-auto" />
+          <div className="flex h-16 shrink-0 items-center mt-6">
+            <img
+              alt="Your Company"
+              src={JijnasLogo}
+              className="h-16 w-auto cursor-pointer"
+              onClick={() => navigate("/")}
+            />
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">

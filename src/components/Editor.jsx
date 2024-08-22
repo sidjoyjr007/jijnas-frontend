@@ -166,7 +166,6 @@ const Editor = ({ model, setModel, type = "" }) => {
             contentChanged: function () {
               // Do something here.
               // this is the editor instance.
-              console.log(this);
             }
           }
         }}

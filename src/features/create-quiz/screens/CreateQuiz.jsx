@@ -29,12 +29,14 @@ import { useNotification } from "../../../context/Notification.context";
 import { localToUTC, generatePromptForQuiz } from "../../../utils/local.utils";
 import SidePanel from "../../../components/SidePanel";
 import AIQuizForm from "../../ai/components/AIQuizForm";
-import { addAIQuizzes } from "../../../state/quiz.slice";
+import { addAIQuizzes, setQuizDetails } from "../../../state/quiz.slice";
 
 const CreateQuiz = ({ isCreate = true }) => {
   const [savingQuiz, setQuizSavingStatus] = useState(false);
   const [open, setOpen] = useState(false);
   const [isSubmitted, setSubmissionstatus] = useState(false);
+  const [isDocumentSubmitted, setDocumentSubmission] = useState(false);
+  const [file, setFile] = useState(null);
 
   const quiz = useSelector((state) => state.quiz);
   const user = useSelector((state) => state.user);
@@ -49,6 +51,15 @@ const CreateQuiz = ({ isCreate = true }) => {
     if (isCreate && !ai) {
       dispatch(createNewQuiz());
     }
+
+    return () => {
+      dispatch(
+        setQuizDetails({
+          key: "aiFile",
+          value: { name: "", id: "", fileSize: "" }
+        })
+      );
+    };
   }, []);
 
   const currentQuizId = quiz?.currentQuizId;
@@ -76,6 +87,16 @@ const CreateQuiz = ({ isCreate = true }) => {
     },
     [currentSlideId, currentSlideId]
   );
+
+  const onFileSelect = (file) => {
+    setFile(file);
+    dispatch(
+      setQuizDetails({
+        key: "aiFile",
+        value: { name: file?.name, id: "", fileSize: file?.size }
+      })
+    );
+  };
 
   const onRemoveQuizSlide = (slideId) => {
     dispatch(removeQuiz({ currentQuizId, slideId, currentSlideId }));
@@ -193,10 +214,7 @@ const CreateQuiz = ({ isCreate = true }) => {
         });
 
         const currentQuizName = quiz.currentQuizName;
-        data[currentQuizId] = {
-          ...data[currentQuizId],
-          ...quiz?.slides?.[currentQuizId]
-        };
+
         dispatch(
           addAIQuizzes({
             data,
@@ -211,6 +229,137 @@ const CreateQuiz = ({ isCreate = true }) => {
     } finally {
       setSubmissionstatus(false);
       setOpen(false);
+    }
+  };
+
+  const processDoucmentResponse = (res) => {
+    const jsonContentMatch = res?.answer?.value?.match(
+      /```json\n([\s\S]+?)\n```/
+    );
+    console.log(jsonContentMatch);
+    let jsonContent = "";
+    if (jsonContentMatch) {
+      jsonContent = JSON.parse(jsonContentMatch[1]);
+    } else {
+      return false;
+    }
+    const quizzes = jsonContent?.quizzes || [];
+    console.log(quizzes);
+
+    if (!quizzes?.length) return false;
+    let currentSlideId = "";
+    const data = { [currentQuizId]: {} };
+    quizzes?.forEach((quiz, index) => {
+      const rightAnswers = [];
+      const options = quiz?.options?.map((option) => {
+        const optionId = uuidV4();
+        if (option?.rightAnswer) rightAnswers.push(optionId);
+        return { value: option?.value, id: optionId };
+      });
+      const slideId = uuidV4();
+      data[currentQuizId][slideId] = {
+        slideId,
+        options,
+        rightAnswers,
+        explanation: quiz?.explanation,
+        questionName: quiz?.questionName,
+        name: quiz?.questionName,
+        question: quiz?.question,
+        changed: true
+      };
+
+      if (index === 0) currentSlideId = slideId;
+    });
+    const currentQuizName = quiz.currentQuizName;
+    data[currentQuizId] = {
+      ...data[currentQuizId],
+      ...quiz?.slides?.[currentQuizId]
+    };
+    dispatch(
+      addAIQuizzes({
+        data,
+        currentQuizId,
+        currentQuizName,
+        currentSlideId
+      })
+    );
+    dispatch(
+      setQuizDetails({
+        key: "aiFile",
+        value: {
+          name: file?.name,
+          id: res?.fileId,
+          assistantId: res?.assistant,
+          vectorStoreId: res?.vectorStore,
+          threadId: res?.thread
+        }
+      })
+    );
+    setOpen(false);
+
+    return true;
+  };
+
+  const handleDocumentBasedGeneration = async () => {
+    const fileId = quiz?.aiFile?.id;
+    const assistantId = quiz?.aiFile?.assistantId;
+    const vectoreStoreId = quiz?.aiFile?.vectorStoreId;
+    const threadId = quiz?.aiFile?.threadId;
+    const fileSize = quiz?.aiFile?.fileSize;
+
+    if (fileId) {
+      try {
+        setDocumentSubmission(true);
+        const res = await axiosInstance.post("/api/v1/ai/regenerate-in-file", {
+          fileId,
+          assistantId,
+          vectoreStoreId,
+          threadId,
+          fileSize,
+          userId: user?.userId
+        });
+        const result = processDoucmentResponse(res?.data);
+        if (!result) {
+          showNotification(
+            "Error",
+            "Unable to generate quiz, please try again later",
+            "alert"
+          );
+        }
+      } catch (err) {
+        showNotification("Error", err.response?.data.message, "alert");
+      } finally {
+        setDocumentSubmission(false);
+        setOpen(false);
+      }
+    } else {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", user?.userId);
+
+      try {
+        setDocumentSubmission(true);
+        const res = await axiosInstance.post(
+          "/api/v1/ai/file-assistant",
+          formData
+        );
+        console.log(res?.data);
+        if (res.status === 200) {
+          const result = processDoucmentResponse(res?.data);
+
+          if (!result) {
+            showNotification(
+              "Error",
+              "Unable to generate quiz, please try again later",
+              "alert"
+            );
+          }
+        }
+      } catch (err) {
+        showNotification("Error", err.response?.data.message, "alert");
+      } finally {
+        setDocumentSubmission(false);
+      }
     }
   };
 
@@ -326,10 +475,21 @@ const CreateQuiz = ({ isCreate = true }) => {
         sidePanelTitle="Generate Quiz"
         handleClose={() => setOpen(false)}
         content={
-          <AIQuizForm
-            handleGenerateQuestions={handleGenerateQuestions}
-            isSubmitted={isSubmitted}
-          />
+          <>
+            <AIQuizForm
+              handleGenerateQuestions={handleGenerateQuestions}
+              isSubmitted={isSubmitted}
+              isDocumentSubmitted={isDocumentSubmitted}
+              handleDocumentBasedGeneration={handleDocumentBasedGeneration}
+              file={file}
+              onFileSelect={onFileSelect}
+            />
+            {isDocumentSubmitted && (
+              <div className="mt-6 text-green-300 font-medium text-xl">
+                Sit back and relax, it takes some time to generate quiz
+              </div>
+            )}
+          </>
         }
       />
     </div>

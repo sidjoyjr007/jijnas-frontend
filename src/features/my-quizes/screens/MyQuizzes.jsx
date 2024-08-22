@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BounceLoader } from "react-spinners";
-import { LightBulbIcon } from "@heroicons/react/24/outline";
+import { LightBulbIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/20/solid";
 
@@ -24,14 +24,17 @@ const MyQuizzes = () => {
   const [refreshQuizList, setRefreshStatus] = useState(false);
 
   useEffect(() => {
-    setQuizLoadingStatus(true);
-    (async () => {
-      console.log("getting quiz");
+    const fetchQuizzes = async () => {
+      setQuizLoadingStatus(true);
       const res = await getMyQuizzes(user?.userId);
       dispatch(addQuizToQuizList({ data: res?.result || [] }));
       setQuizList(res?.result);
       setQuizLoadingStatus(false);
-    })();
+    };
+
+    if (!quiz?.isMyQuizzesVisted || refreshQuizList) {
+      fetchQuizzes();
+    }
   }, [refreshQuizList]);
 
   useEffect(() => {
@@ -53,7 +56,10 @@ const MyQuizzes = () => {
       )}
       {quiz?.quizList?.length > 0 && !isQuizLoading && (
         <div className="px-4 py-4 rounded-lg   h-full">
-          <div className="flex flex-row justify-end mb-4 items-center gap-4">
+          <div className="flex flex-row flex-wrap justify-end mb-4 items-center gap-4">
+            <div onClick={() => setRefreshStatus((prevState) => !prevState)}>
+              <ArrowPathIcon className="h-8 w-8 text-gray-300 cursor-pointer" />
+            </div>
             <div>
               <TextInput
                 placeholder="Search your quizzes"

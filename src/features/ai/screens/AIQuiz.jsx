@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from "uuid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -8,13 +8,40 @@ import axiosInstance from "../../../utils/axios-config.utils";
 import { useNotification } from "../../../context/Notification.context";
 import AIQuizForm from "../components/AIQuizForm";
 import { generatePromptForQuiz } from "../../../utils/local.utils";
+import { setQuizDetails } from "../../../state/quiz.slice";
 
 const AIQuiz = () => {
   const user = useSelector((state) => state.user);
+  const quiz = useSelector((state) => state.quiz);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isSubmitted, setSubmissionstatus] = useState(false);
+  const [isDocumentSubmitted, setDocumentSubmission] = useState(false);
+  const [file, setFile] = useState(quiz?.aiFile?.name || null);
+
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    return () => {
+      dispatch(
+        setQuizDetails({
+          key: "aiFile",
+          value: { name: "", id: "", fileSize: "" }
+        })
+      );
+    };
+  }, []);
+
+  const onFileSelect = (file) => {
+    setFile(file);
+    dispatch(
+      setQuizDetails({
+        key: "aiFile",
+        value: { name: file?.name, id: "", fileSize: file?.size }
+      })
+    );
+  };
 
   const handleGenerateQuestions = async (level, info, quizNumber) => {
     const question = generatePromptForQuiz(level, info, quizNumber);
@@ -29,6 +56,7 @@ const AIQuiz = () => {
       if (res.status === 200) {
         const quizzes = JSON.parse(res?.data?.response)?.quizzes || [];
         const currentQuizId = uuidV4();
+
         let currentSlideId = "";
         const data = { [currentQuizId]: {} };
         quizzes?.forEach((quiz, index) => {
@@ -66,16 +94,100 @@ const AIQuiz = () => {
     }
   };
 
+  const handleDocumentBasedGeneration = async () => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userId", user?.userId);
+
+    try {
+      setDocumentSubmission(true);
+      const res = await axiosInstance.post(
+        "/api/v1/ai/file-assistant",
+        formData
+      );
+      if (res.status === 200) {
+        const jsonContentMatch = await res?.data?.answer?.value?.match(
+          /```json\n([\s\S]+?)\n```/
+        );
+
+        let jsonContent = "";
+        if (jsonContentMatch) {
+          jsonContent = JSON.parse(jsonContentMatch[1]);
+        } else {
+          console.error("No JSON content found");
+        }
+        console.log(jsonContent, typeof jsonContent);
+        const quizzes = jsonContent?.quizzes || [];
+        const currentQuizId = uuidV4();
+        let currentSlideId = "";
+        const data = { [currentQuizId]: {} };
+        console.log(quizzes);
+        jsonContent?.quizzes?.forEach((quiz, index) => {
+          const rightAnswers = [];
+          const options = quiz?.options?.map((option) => {
+            const optionId = uuidV4();
+            if (option?.rightAnswer) rightAnswers.push(optionId);
+            return { value: option?.value, id: optionId };
+          });
+          const slideId = uuidV4();
+          data[currentQuizId][slideId] = {
+            slideId,
+            options,
+            rightAnswers,
+            explanation: quiz?.explanation,
+            questionName: quiz?.questionName,
+            name: quiz?.questionName,
+            question: quiz?.question,
+            changed: true
+          };
+          console.log(slideId, data);
+
+          if (index === 0) currentSlideId = slideId;
+        });
+        const currentQuizName = `Untitled_Quiz_${uuidV4()}`;
+        console.log(data, currentQuizId);
+        dispatch(
+          addAIQuizzes({ data, currentQuizId, currentQuizName, currentSlideId })
+        );
+        dispatch(
+          setQuizDetails({
+            key: "aiFile",
+            value: {
+              name: file?.name,
+              id: res?.fileId,
+              assistantId: res?.assistant,
+              vectorStoreId: res?.vectorStore,
+              threadId: res?.thread
+            }
+          })
+        );
+        navigate("/app/create-quiz/", {
+          state: { ai: true }
+        });
+      }
+    } catch (err) {
+      showNotification("Error", err.response?.data.message, "alert");
+    } finally {
+      setDocumentSubmission(false);
+    }
+  };
+
   return (
     <>
       <div className="xl:px-48 2xl:px-72 h-full  px-4 py-6  ">
-        <div className=" bg-gray-600/10 rounded-md  px-4 py-4 flex flex-col border border-white/5 gap-y-4">
-          <div className="text-3xl text-gray-300 py-4">Generate AI Quiz</div>
-          <AIQuizForm
-            handleGenerateQuestions={handleGenerateQuestions}
-            isSubmitted={isSubmitted}
-          />
-        </div>
+        <AIQuizForm
+          handleGenerateQuestions={handleGenerateQuestions}
+          isSubmitted={isSubmitted}
+          isDocumentSubmitted={isDocumentSubmitted}
+          handleDocumentBasedGeneration={handleDocumentBasedGeneration}
+          file={file}
+          onFileSelect={onFileSelect}
+        />
+        {isDocumentSubmitted && (
+          <div className="mt-4 text-gray-300 font-medium text-xl">
+            Sit back and relax, it takes some time to generate quiz
+          </div>
+        )}
       </div>
     </>
   );

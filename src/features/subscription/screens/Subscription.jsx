@@ -194,10 +194,20 @@ const Subscription = () => {
   };
 
   const tokenPrice = user?.price?.price_per_50_tokens || undefined;
-  const { AI = "", NORMAL = "" } = user?.price?.products || {};
+  const {
+    AI = "",
+    NORMAL = "",
+    FILE_100KB = "",
+    MIN_FILE_TOKEN = ""
+  } = user?.price?.products || {};
   const data = [
+    { activity: "Create and host quiz event", tokens: NORMAL },
     { activity: "Generate AI quiz", tokens: AI },
-    { activity: "Create and host quiz event", tokens: NORMAL }
+    { activity: "Document quiz generator (every 100KiB)", tokens: FILE_100KB },
+    {
+      activity: "Minimum tokens for document quiz generator",
+      tokens: MIN_FILE_TOKEN
+    }
   ];
 
   return (

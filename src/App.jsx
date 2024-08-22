@@ -110,7 +110,7 @@ const App = () => {
             className="-m-2.5 p-2.5 text-gray-700 xl:hidden"
           >
             <span className="sr-only">Open sidebar</span>
-            <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+            <Bars3Icon aria-hidden="true" className="h-6 w-6 text-gray-300" />
           </button>
 
           {/* Separator */}
@@ -119,8 +119,8 @@ const App = () => {
             className="h-6 w-px bg-gray-900/10 lg:hidden"
           />
 
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-between">
-            <div className="flex items-center gap-x-4 lg:gap-x-6 ">
+          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 sm:justify-between justify-end">
+            <div className="hidden sm:flex items-center gap-x-4 lg:gap-x-6 ">
               <BreadCrum />
             </div>
             <div className="flex items-center gap-x-4 lg:gap-x-6 ">

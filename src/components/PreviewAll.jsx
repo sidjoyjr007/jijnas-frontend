@@ -189,24 +189,42 @@ const PreviewAll = ({ preview = true }) => {
                   </div>
                 </TransitionChild>
                 {/* Sidebar component, swap this element with another sidebar if you like */}
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-2">
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900/80 pb-2">
+                  <div className="px-4 py-3 text-xl text-gray-400 ">
+                    Questions
+                  </div>
+
                   <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
                       <li>
-                        <ul role="list" className="-mx-2 space-y-1">
+                        <ul role="list" className="divide-y divide-white/5">
                           {questionLabels?.map((item) => (
-                            <li key={item.id}>
-                              <a
+                            <li
+                              onClick={() => {
+                                handleQuestionChange(item?.id);
+                                setSidebarOpen(false);
+                              }}
+                              key={item.id}
+                              className="px-2 flex items-center justify-between hover:bg-gray-800 cursor-pointer"
+                            >
+                              <div
                                 href={item.label}
                                 className={classNames(
                                   item.id === questions?.currentQuestionId
-                                    ? "bg-gray-50 text-indigo-600"
-                                    : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                                  "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
+                                    ? " text-indigo-500 "
+                                    : "text-gray-400 hover:text-indigo-500",
+                                  "group flex gap-x-3 rounded-md p-2 text-sm font-medium leading-6"
                                 )}
                               >
                                 {item.label}
-                              </a>
+                              </div>
+                              <CheckCircleIcon
+                                className={`h-6 w-6 ${
+                                  questionsData?.[item?.id]?.isSubmitted
+                                    ? "text-indigo-500"
+                                    : "text-gray-400"
+                                } `}
+                              />
                             </li>
                           ))}
                         </ul>
@@ -267,21 +285,18 @@ const PreviewAll = ({ preview = true }) => {
               className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
             >
               <span className="sr-only">Open sidebar</span>
-              <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+              <Bars3Icon aria-hidden="true" className="h-6 w-6 text-gray-300" />
             </button>
-            <div className="flex-1 text-sm font-semibold leading-6 text-gray-900">
-              Dashboard
-            </div>
           </div>
 
-          <main className=" lg:pl-72   ">
-            <div className="  mx-4 mt-4 rounded-xl border-2  border-white/5">
+          <main className=" lg:pl-72  pl-0 ">
+            <div className="  mx-4 mt-2 rounded-xl border-2  border-white/5">
               <div className="py-4 flex justify-between  rounded-t-md border-b-2 border-white/5 bg-gray-700/10 text-gray-400  px-4 font-medium ">
-                <div className=" text-xl text-gray-400 ">
+                <div className=" text-gray-400 text-sm xl:text-base ">
                   {quizzes?.[questions?.currentQuestionId]?.questionName}
                 </div>
               </div>
-              <div className="px-6 py-6 h-70vh overflow-auto text-gray-200  bg-gray-700/10">
+              <div className="px-6 py-6 h-70vh overflow-auto text-gray-200  bg-gray-700/10 text-sm xl:text-base">
                 <div>
                   <FroalaEditorView
                     model={

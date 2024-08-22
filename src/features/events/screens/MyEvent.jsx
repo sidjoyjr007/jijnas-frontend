@@ -5,7 +5,11 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { addEventToEventList } from "../../../state/quiz.slice";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { EllipsisVerticalIcon, PlusIcon } from "@heroicons/react/20/solid";
+import {
+  EllipsisVerticalIcon,
+  PlusIcon,
+  ArrowPathIcon
+} from "@heroicons/react/20/solid";
 import { copyToClipBoard } from "../../../utils/constant";
 import TextInput from "../../../components/TextInput";
 import { BounceLoader } from "react-spinners";
@@ -23,10 +27,11 @@ const MyEvents = () => {
 
   const [searchValue, setSearchValue] = useState("");
   const [isQuizLoading, setQuizLoadingStatus] = useState(false);
+  const [refreshEventList, setRefreshStatus] = useState(false);
 
   useEffect(() => {
-    setQuizLoadingStatus(true);
-    (async () => {
+    const fetchEvents = async () => {
+      setQuizLoadingStatus(true);
       try {
         const res = await axiosInstance.get(
           `/api/v1/quiz/my-events?userId=${user?.userId}`
@@ -41,7 +46,6 @@ const MyEvents = () => {
               );
               return { ...event, status };
             });
-            console.log(newData);
           }
           dispatch(addEventToEventList({ data: newData }));
           return;
@@ -52,8 +56,12 @@ const MyEvents = () => {
       } finally {
         setQuizLoadingStatus(false);
       }
-    })();
-  }, []);
+    };
+
+    if (!quiz?.isMyEventsVisted || refreshEventList) {
+      fetchEvents();
+    }
+  }, [refreshEventList]);
 
   const copyLink = async (url) => {
     const res = await copyToClipBoard(url);
@@ -97,12 +105,10 @@ const MyEvents = () => {
         header: "Status",
         accessorKey: "status",
         cell: ({ row }) => {
-          console.log(row?.original);
           const status = getEventStatus(
             row?.original?.startTime,
             parseInt(row?.original?.timing)
           );
-          console.log(status);
           if (status === "Not Started") return "-";
           const color =
             status === "Started" ? "fill-blue-400" : "fill-green-400";
@@ -184,7 +190,10 @@ const MyEvents = () => {
       )}
       {!isQuizLoading && (
         <div className="px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-row justify-end mb-4 items-center gap-4">
+          <div className="flex flex-row flex-wrap justify-end mb-4 items-center gap-4">
+            <div onClick={() => setRefreshStatus((prevState) => !prevState)}>
+              <ArrowPathIcon className="h-8 w-8 text-gray-300 cursor-pointer" />
+            </div>
             <div>
               <TextInput
                 placeholder="Search Events"

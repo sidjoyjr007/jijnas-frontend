@@ -184,7 +184,8 @@ const quizSlice = createSlice({
       const { data } = action?.payload;
       return {
         ...state,
-        quizList: data
+        quizList: data,
+        isMyQuizzesVisted: true
       };
     },
     removeQuizFromQuizList: (state, action) => {
@@ -220,7 +221,7 @@ const quizSlice = createSlice({
       return {
         ...state,
         events: data,
-        myEventsVisited: true
+        isMyEventsVisted: true
       };
     },
     addAIQuizzes: (state, action) => {
@@ -235,6 +236,13 @@ const quizSlice = createSlice({
           ...state.slides,
           ...data
         }
+      };
+    },
+    setQuizDetails: (state, action) => {
+      const { key, value } = action?.payload;
+      return {
+        ...state,
+        [key]: value
       };
     }
   }
@@ -255,7 +263,8 @@ export const {
   addEventToEventList,
   changeSlideStatus,
   deleteQuiz,
-  addAIQuizzes
+  addAIQuizzes,
+  setQuizDetails
 } = quizSlice.actions;
 
 export default quizSlice.reducer;
