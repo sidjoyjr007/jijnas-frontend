@@ -8,8 +8,8 @@ import AIText from "./AIText";
 import AIDocument from "./AIDocument";
 
 const options = [
-  { name: "Document", icon: DocumentPlusIcon },
-  { name: "Text", icon: Bars3CenterLeftIcon }
+  { name: "Text", icon: Bars3CenterLeftIcon },
+  { name: "Document", icon: DocumentPlusIcon }
 ];
 
 const AIQuizForm = ({

@@ -215,6 +215,11 @@ const CreateQuiz = ({ isCreate = true }) => {
 
         const currentQuizName = quiz.currentQuizName;
 
+        data[currentQuizId] = {
+          ...data[currentQuizId],
+          ...quiz?.slides?.[currentQuizId]
+        };
+
         dispatch(
           addAIQuizzes({
             data,

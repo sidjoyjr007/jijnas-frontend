@@ -1088,6 +1088,14 @@ select{
   margin-top: 2rem;
 }
 
+.mb-12{
+  margin-bottom: 3rem;
+}
+
+.mb-8{
+  margin-bottom: 2rem;
+}
+
 .box-border{
   box-sizing: border-box;
 }
@@ -1422,8 +1430,16 @@ select{
           user-select: none;
 }
 
+.list-inside{
+  list-style-position: inside;
+}
+
 .list-decimal{
   list-style-type: decimal;
+}
+
+.list-disc{
+  list-style-type: disc;
 }
 
 .grid-cols-1{

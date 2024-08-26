@@ -31,6 +31,7 @@ const AIQuiz = lazy(() => import("./features/ai/screens/AIQuiz"));
 const QuizEvent = lazy(() => import("./features/events/screens/QuizEvent"));
 const Results = lazy(() => import("./features/events/screens/Results"));
 const ErrorPage = lazy(() => import("./components/ErrorPage"));
+const TermsAndConditions = lazy(() => import("./components/T&C"));
 
 import { signedup } from "./state/user.slice";
 import axiosInstance from "./utils/axios-config.utils";
@@ -153,6 +154,10 @@ const WrappedRoutes = () => {
       action() {
         return redirect("/");
       }
+    },
+    {
+      path: "/TandC",
+      element: <TermsAndConditions />
     }
   ]);
 

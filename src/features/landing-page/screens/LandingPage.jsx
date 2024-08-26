@@ -6,7 +6,7 @@ import {
 import jijnasLogo from "../../../assets/logo.svg";
 import Button from "../../../components/Button";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import TextInput from "../../../components/TextInput";
 import { useState } from "react";
 import { EMAIL_REGEX } from "../../../utils/constant";
@@ -300,8 +300,17 @@ const LandingPage = () => {
         <div className="mx-auto max-w-7xl px-6 pb-8 pt-4 lg:px-8">
           <div className="border-t border-white/10 pt-8 md:flex md:items-center md:justify-between">
             <p className="mt-8 text-xs leading-5 text-gray-400 md:order-1 md:mt-0">
-              &copy; {new Date().getFullYear()} JIJNAS, Inc. All rights
-              reserved.
+              &copy; {new Date().getFullYear()} QuizNex All rights, reserved.{" "}
+              <Link
+                to="/TandC"
+                target="_blank"
+                className="cursor-pointer text-indigo-600"
+              >
+                Terms and Conditions
+              </Link>
+            </p>
+            <p className="text-gray-300">
+              Contact us : jijnasinka@gmail.com/7619410706
             </p>
           </div>
         </div>
