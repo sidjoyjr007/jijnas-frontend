@@ -24,7 +24,7 @@ import {
 } from "@headlessui/react";
 import { PlusIcon, MinusIcon, LightBulbIcon } from "@heroicons/react/20/solid";
 import FroalaEditorView from "react-froala-wysiwyg/FroalaEditorView";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Button from "./Button";
 import axiosInstance from "../utils/axios-config.utils";
 import { useNotification } from "../context/Notification.context";
@@ -37,6 +37,7 @@ function classNames(...classes) {
 const PreviewAll = ({ preview = true }) => {
   const { quizId } = useParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [quizName, setQuizName] = useState("");
   const [quizzes, setQuizzes] = useState({});
   const [questions, setQuesions] = useState({
     labels: [],
@@ -78,6 +79,57 @@ const PreviewAll = ({ preview = true }) => {
   };
 
   useEffect(() => {
+    // Function to remove the parent div of the selected elements
+    const maskElement = (elements) => {
+      elements.forEach((element) => {
+        const parentDiv = element.closest("p"); // Find the closest parent div
+        if (parentDiv) {
+          parentDiv.remove(); // Remove the parent div from the DOM
+        }
+      });
+    };
+
+    // Function to observe changes in the DOM
+    const observeDOMChanges = (selector) => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              const matchingElements = node.querySelectorAll(selector);
+              maskElement(Array.from(matchingElements));
+            }
+          });
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      // Initial check in case the elements are already present
+      const initialElements = document.querySelectorAll(selector);
+      if (initialElements.length > 0) {
+        maskElement(Array.from(initialElements));
+      }
+
+      // Cleanup function to disconnect the observer when the component unmounts
+      return () => observer.disconnect();
+    };
+
+    // Use the appropriate selector to match any href containing "froala.com"
+    const selector = 'a[href*="froala.com"]';
+
+    // Start observing
+    const disconnectObserver = observeDOMChanges(selector);
+
+    // Cleanup function to disconnect the observer when the component unmounts
+    return () => {
+      disconnectObserver();
+    };
+  }, []);
+
+  useEffect(() => {
     if (quizId) {
       (async () => {
         setQuizLoadingStatus(true);
@@ -86,7 +138,9 @@ const PreviewAll = ({ preview = true }) => {
             `/api/v1/quiz/my-quiz?quizId=${quizId}`
           );
           if (res.status === 200) {
-            formatQuizData(res?.data?.results[0]);
+            const response = res?.data?.results[0];
+            formatQuizData(response || []);
+            setQuizName(response?.quizName);
             return;
           }
           showNotification("Error", res?.data?.message, "alert");
@@ -158,142 +212,11 @@ const PreviewAll = ({ preview = true }) => {
 
       {!isQuizLoading && questions?.labels?.length > 0 ? (
         <div className="h-screen">
-          <Dialog
-            open={sidebarOpen}
-            onClose={setSidebarOpen}
-            className="relative z-50 lg:hidden"
-          >
-            <DialogBackdrop
-              transition
-              className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
-            />
-
-            <div className="fixed inset-0 flex">
-              <DialogPanel
-                transition
-                className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-[closed]:-translate-x-full"
-              >
-                <TransitionChild>
-                  <div className="absolute left-full top-0 flex w-16 justify-center pt-5 duration-300 ease-in-out data-[closed]:opacity-0">
-                    <button
-                      type="button"
-                      onClick={() => setSidebarOpen(false)}
-                      className="-m-2.5 p-2.5"
-                    >
-                      <span className="sr-only">Close sidebar</span>
-                      <XMarkIcon
-                        aria-hidden="true"
-                        className="h-6 w-6 text-white"
-                      />
-                    </button>
-                  </div>
-                </TransitionChild>
-                {/* Sidebar component, swap this element with another sidebar if you like */}
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900/80 pb-2">
-                  <div className="px-4 py-3 text-xl text-gray-400 ">
-                    Questions
-                  </div>
-
-                  <nav className="flex flex-1 flex-col">
-                    <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                      <li>
-                        <ul role="list" className="divide-y divide-white/5">
-                          {questionLabels?.map((item) => (
-                            <li
-                              onClick={() => {
-                                handleQuestionChange(item?.id);
-                                setSidebarOpen(false);
-                              }}
-                              key={item.id}
-                              className="px-2 flex items-center justify-between hover:bg-gray-800 cursor-pointer"
-                            >
-                              <div
-                                href={item.label}
-                                className={classNames(
-                                  item.id === questions?.currentQuestionId
-                                    ? " text-indigo-500 "
-                                    : "text-gray-400 hover:text-indigo-500",
-                                  "group flex gap-x-3 rounded-md p-2 text-sm font-medium leading-6"
-                                )}
-                              >
-                                {item.label}
-                              </div>
-                              <CheckCircleIcon
-                                className={`h-6 w-6 ${
-                                  questionsData?.[item?.id]?.isSubmitted
-                                    ? "text-indigo-500"
-                                    : "text-gray-400"
-                                } `}
-                              />
-                            </li>
-                          ))}
-                        </ul>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </DialogPanel>
-            </div>
-          </Dialog>
-
-          {/* Static sidebar for desktop */}
-          <div className="hidden lg:fixed lg:inset-y-0 left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r border-white/5  bg-gray-900/80 ">
-            {/* Sidebar component, swap this element with another sidebar if you like */}
-            <div className="flex grow flex-col hover:overflow-y-auto border-r border-white/5 ">
-              <div className="px-4 py-3 text-xl text-gray-400 ">Questions</div>
-              <nav className="flex flex-1 flex-col">
-                <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                  <li>
-                    <ul role="list" className=" divide-y divide-white/5">
-                      {questionLabels?.map((item) => (
-                        <li
-                          onClick={() => handleQuestionChange(item?.id)}
-                          key={item.id}
-                          className=" px-2 flex items-center justify-between hover:bg-gray-800 cursor-pointer"
-                        >
-                          <div
-                            href={item.label}
-                            className={classNames(
-                              item.id === questions?.currentQuestionId
-                                ? " text-indigo-500 "
-                                : "text-gray-400 hover:text-indigo-500",
-                              "group flex gap-x-3 rounded-md p-2 text-sm font-medium leading-6"
-                            )}
-                          >
-                            {item.label}
-                          </div>
-                          <CheckCircleIcon
-                            className={`h-6 w-6 ${
-                              questionsData?.[item?.id]?.isSubmitted
-                                ? "text-indigo-500"
-                                : "text-gray-400"
-                            } `}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
-
-          <div className="sticky top-0 z-40 flex items-center gap-x-6  px-4 py-4 shadow-sm sm:px-6 lg:hidden">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
-            >
-              <span className="sr-only">Open sidebar</span>
-              <Bars3Icon aria-hidden="true" className="h-6 w-6 text-gray-300" />
-            </button>
-          </div>
-
-          <main className=" lg:pl-72  pl-0 ">
+          <main className="   pl-0 ">
             <div className="  mx-4 mt-2 rounded-xl border-2  border-white/5">
               <div className="py-4 flex justify-between  rounded-t-md border-b-2 border-white/5 bg-gray-700/10 text-gray-400  px-4 font-medium ">
                 <div className=" text-gray-400 text-sm xl:text-base ">
-                  {quizzes?.[questions?.currentQuestionId]?.questionName}
+                  {quizName}
                 </div>
               </div>
               <div className="px-6 py-6 h-70vh overflow-auto text-gray-200  bg-gray-700/10 text-sm xl:text-base">

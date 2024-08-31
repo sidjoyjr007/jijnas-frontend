@@ -10,7 +10,7 @@ const Subscription = () => {
   const user = useSelector((state) => state.user);
   const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
-    tokens: { value: "100" }
+    tokens: { value: "250" }
   });
 
   const handleBlur = (key) => {
@@ -136,12 +136,12 @@ const Subscription = () => {
       const data = res?.data?.order;
       if (data && data?.order_id) {
         const paymentObject = new window.Razorpay({
-          key: "rzp_test_cgh9oeAqPaQcRZ",
+          key: "rzp_live_PjUfbMmCveGtHY",
           order_id: data.order_id,
           currency: data.currency,
           amount: data.amount,
-          name: "JIJANS",
-          description: "Test Wallet Transaction",
+          name: "QuizNex",
+          description: "QuizNex token transaction",
           notes: {
             userId: user?.userId,
             paymentTime: localToUTC(new Date().valueOf())

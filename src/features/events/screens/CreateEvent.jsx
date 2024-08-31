@@ -163,8 +163,6 @@ const CreateEvent = () => {
     return false;
   };
 
-  console.log(quiz?.quizList);
-
   const EmptyQuiz = (
     <div>
       Did not found any quizzes to create an event, please try again if there

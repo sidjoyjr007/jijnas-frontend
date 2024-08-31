@@ -28,7 +28,6 @@ const Option = ({
     }
   };
 
-  console.log(isSelectable);
   return (
     <div
       className={getClassName()}

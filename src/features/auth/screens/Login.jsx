@@ -90,9 +90,6 @@ const Login = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("log in");
-  }, []);
   return (
     <>
       {user?.isLoggedIn && !user?.verified && (

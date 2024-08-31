@@ -17,7 +17,6 @@ const EventForm = ({
   quizzes,
   setRefreshStatus
 }) => {
-  console.log(additionalInfo);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: "",
@@ -73,7 +72,6 @@ const EventForm = ({
     } = formData;
     if (name?.value && !name?.err && email?.value && !email?.err) {
       if (additionalInfo) {
-        console.log(info?.value);
         return !(info?.value && !info?.err);
       }
       return false;

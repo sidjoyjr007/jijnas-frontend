@@ -1,7 +1,6 @@
 import Option from "./Option";
 
 const OptionsList = ({ options = [], ...rest }) => {
-  console.log(options);
   return (
     <div className="mt-4 mb-4 ">
       <ol className="flex flex-col rounded-md ">

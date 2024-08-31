@@ -241,7 +241,6 @@ const CreateQuiz = ({ isCreate = true }) => {
     const jsonContentMatch = res?.answer?.value?.match(
       /```json\n([\s\S]+?)\n```/
     );
-    console.log(jsonContentMatch);
     let jsonContent = "";
     if (jsonContentMatch) {
       jsonContent = JSON.parse(jsonContentMatch[1]);
@@ -249,7 +248,6 @@ const CreateQuiz = ({ isCreate = true }) => {
       return false;
     }
     const quizzes = jsonContent?.quizzes || [];
-    console.log(quizzes);
 
     if (!quizzes?.length) return false;
     let currentSlideId = "";
@@ -348,7 +346,6 @@ const CreateQuiz = ({ isCreate = true }) => {
           "/api/v1/ai/file-assistant",
           formData
         );
-        console.log(res?.data);
         if (res.status === 200) {
           const result = processDoucmentResponse(res?.data);
 

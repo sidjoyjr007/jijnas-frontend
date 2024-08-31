@@ -980,6 +980,10 @@ select{
   margin-right: -0.25rem;
 }
 
+.mb-12{
+  margin-bottom: 3rem;
+}
+
 .mb-2{
   margin-bottom: 0.5rem;
 }
@@ -990,6 +994,10 @@ select{
 
 .mb-6{
   margin-bottom: 1.5rem;
+}
+
+.mb-8{
+  margin-bottom: 2rem;
 }
 
 .mb-\[-12\%\]{
@@ -1086,14 +1094,6 @@ select{
 
 .mt-8{
   margin-top: 2rem;
-}
-
-.mb-12{
-  margin-bottom: 3rem;
-}
-
-.mb-8{
-  margin-bottom: 2rem;
 }
 
 .box-border{
@@ -1569,6 +1569,10 @@ select{
 
 .gap-y-8{
   row-gap: 2rem;
+}
+
+.gap-y-2{
+  row-gap: 0.5rem;
 }
 
 .space-x-3 > :not([hidden]) ~ :not([hidden]){
@@ -3043,6 +3047,10 @@ body {
 }
 
 @media (min-width: 640px){
+  .sm\:visible{
+    visibility: visible;
+  }
+
   .sm\:left-\[calc\(50\%-18rem\)\]{
     left: calc(50% - 18rem);
   }
@@ -3094,8 +3102,16 @@ body {
     margin-top: 14rem;
   }
 
+  .sm\:block{
+    display: block;
+  }
+
   .sm\:flex{
     display: flex;
+  }
+
+  .sm\:hidden{
+    display: none;
   }
 
   .sm\:h-10{
@@ -3272,6 +3288,10 @@ body {
 }
 
 @media (min-width: 768px){
+  .md\:visible{
+    visibility: visible;
+  }
+
   .md\:right-6{
     right: 1.5rem;
   }

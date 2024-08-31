@@ -15,7 +15,6 @@ const AddOptions = () => {
     const newOption = { value: "Hey", rightAnswer: false, id: uuidv4() };
     const optionsStateVal = [...options];
     optionsStateVal.push(newOption);
-    console.log(options);
     dispatch(
       addQuizOption({
         currentQuizId,
@@ -41,7 +40,6 @@ const AddOptions = () => {
   };
 
   const handleChange = (value, id) => {
-    console.log(value);
     const index = options?.findIndex((item) => item?.id === id);
     if (index >= 0) {
       const newOptions = structuredClone(options);

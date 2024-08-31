@@ -23,14 +23,12 @@ const AIQuiz = () => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    return () => {
-      dispatch(
-        setQuizDetails({
-          key: "aiFile",
-          value: { name: "", id: "", fileSize: "" }
-        })
-      );
-    };
+    dispatch(
+      setQuizDetails({
+        key: "aiFile",
+        value: { name: "", id: "", fileSize: "" }
+      })
+    );
   }, []);
 
   const onFileSelect = (file) => {
@@ -116,13 +114,11 @@ const AIQuiz = () => {
         } else {
           console.error("No JSON content found");
         }
-        console.log(jsonContent, typeof jsonContent);
         const quizzes = jsonContent?.quizzes || [];
         const currentQuizId = uuidV4();
         let currentSlideId = "";
         const data = { [currentQuizId]: {} };
-        console.log(quizzes);
-        jsonContent?.quizzes?.forEach((quiz, index) => {
+        quizzes?.forEach((quiz, index) => {
           const rightAnswers = [];
           const options = quiz?.options?.map((option) => {
             const optionId = uuidV4();
@@ -140,12 +136,9 @@ const AIQuiz = () => {
             question: quiz?.question,
             changed: true
           };
-          console.log(slideId, data);
-
           if (index === 0) currentSlideId = slideId;
         });
         const currentQuizName = `Untitled_Quiz_${uuidV4()}`;
-        console.log(data, currentQuizId);
         dispatch(
           addAIQuizzes({ data, currentQuizId, currentQuizName, currentSlideId })
         );
@@ -154,10 +147,10 @@ const AIQuiz = () => {
             key: "aiFile",
             value: {
               name: file?.name,
-              id: res?.fileId,
-              assistantId: res?.assistant,
-              vectorStoreId: res?.vectorStore,
-              threadId: res?.thread
+              id: res?.data?.fileId,
+              assistantId: res?.data?.assistant,
+              vectorStoreId: res?.data?.vectorStore,
+              threadId: res?.data?.thread
             }
           })
         );

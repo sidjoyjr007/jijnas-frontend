@@ -56,18 +56,18 @@ const QuizCard = ({ quizList = [], setRefreshStatus }) => {
         role="list"
         className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2  2xl:grid-cols-4 xl:gap-x-8"
       >
-        {quizList.map((quiz) => (
+        {quizList?.map((quiz) => (
           <li
             key={quiz?.quizId}
             className="overflow-hidden rounded-xl border border-white/5 "
           >
             <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-700/10 p-6">
               <div
-                onClick={() => navigation(`/app/my-quizzes/${quiz.quizId}`)}
+                onClick={() => navigation(`/app/my-quizzes/${quiz?.quizId}`)}
                 className={`flex justify-center items-center h-12 w-12 flex-none rounded-lg bg-indigo-100 object-cover ring-1 ring-indigo-900/10 cursor-pointer`}
               >
                 <span className="font-bold text-2xl text-indigo-700">
-                  {quiz.quizName
+                  {quiz?.quizName
                     .split(" ")
                     .splice(0, 2)
                     .map((str) => str.charAt(0))
@@ -80,7 +80,7 @@ const QuizCard = ({ quizList = [], setRefreshStatus }) => {
                 className="text-sm font-medium leading-6 text-gray-400 truncate"
                 title={quiz?.quizName}
               >
-                {quiz.quizName}
+                {quiz?.quizName}
               </div>
               <Menu as="div" className="relative ml-auto ">
                 <MenuButton className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
@@ -96,7 +96,7 @@ const QuizCard = ({ quizList = [], setRefreshStatus }) => {
                 >
                   <MenuItem>
                     <Link
-                      to={`/preview/${quiz.quizId}`}
+                      to={`/preview/${quiz?.quizId}`}
                       target="_blank"
                       className="block px-3 py-1 text-sm leading-6 text-gray-400 data-[focus]:bg-white/15"
                     >
@@ -105,9 +105,9 @@ const QuizCard = ({ quizList = [], setRefreshStatus }) => {
                   </MenuItem>
                   <MenuItem>
                     <Link
-                      to={`/app/my-quizzes/${quiz.quizId}`}
+                      to={`/app/my-quizzes/${quiz?.quizId}`}
                       state={{
-                        currentQuizName: quiz.quizName
+                        currentQuizName: quiz?.quizName
                       }}
                       className="block px-3 py-1 text-sm leading-6 text-gray-400 data-[focus]:bg-white/15"
                     >

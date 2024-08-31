@@ -22,7 +22,6 @@ const AddOptions = ({ dispatch, currentQuizId, currentSlideId, quiz }) => {
     const newOption = { value: "Hey", id: uuidv4() };
     const optionsStateVal = [...options];
     optionsStateVal.push(newOption);
-    console.log(options);
     dispatch(
       addQuizOption({
         currentQuizId,
@@ -60,7 +59,6 @@ const AddOptions = ({ dispatch, currentQuizId, currentSlideId, quiz }) => {
   };
 
   const handleChange = (value, id) => {
-    console.log(value);
     const index = options?.findIndex((item) => item?.id === id);
 
     if (index >= 0) {
@@ -68,17 +66,13 @@ const AddOptions = ({ dispatch, currentQuizId, currentSlideId, quiz }) => {
       const newRightAnswers = [...rightAnswers];
 
       if (typeof value === "boolean") {
-        console.log(value);
         const optionIdx = newRightAnswers?.findIndex(
           (optionId) => optionId === id
         );
-        console.log(optionIdx);
         if (optionIdx === undefined || optionIdx === -1) {
           newRightAnswers.push(id);
         } else {
-          console.log("hjhj");
           newRightAnswers.splice(optionIdx, 1);
-          console.log(newRightAnswers);
         }
       } else {
         newOptions[index]["value"] = value;
@@ -94,7 +88,6 @@ const AddOptions = ({ dispatch, currentQuizId, currentSlideId, quiz }) => {
     }
   };
 
-  console.log(rightAnswers);
   return (
     <div>
       <div

@@ -17,7 +17,6 @@ const Results = () => {
   const { showNotification } = useNotification();
   const location = useLocation();
   const { state } = location;
-  console.log(state);
 
   const getFinishTime = (finishTime) => {
     if (!finishTime) return `${parseInt(state?.eventData?.timing)} minutes`;
@@ -96,7 +95,6 @@ const Results = () => {
             csvData?.push(eachRow);
           });
           setCSVData(csvData);
-          console.log(colHeaders, csvData);
           setResultData(resultData);
           return;
         }
@@ -120,7 +118,11 @@ const Results = () => {
       {!isResultsLoading && (
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-end m-4 cursor-pointer">
-            <CSVLink data={csvData} target="_blank">
+            <CSVLink
+              data={csvData}
+              target="_blank"
+              filename={`Results_for_event_${eventId}`}
+            >
               <Button label="Download CSV" />
             </CSVLink>
           </div>
