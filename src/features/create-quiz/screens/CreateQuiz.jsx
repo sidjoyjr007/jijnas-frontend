@@ -52,14 +52,14 @@ const CreateQuiz = ({ isCreate = true }) => {
       dispatch(createNewQuiz());
     }
 
-    return () => {
-      dispatch(
-        setQuizDetails({
-          key: "aiFile",
-          value: { name: "", id: "", fileSize: "" }
-        })
-      );
-    };
+    // return () => {
+    //   dispatch(
+    //     setQuizDetails({
+    //       key: "aiFile",
+    //       value: { name: "", id: "", fileSize: "" }
+    //     })
+    //   );
+    // };
   }, []);
 
   const currentQuizId = quiz?.currentQuizId;
@@ -309,6 +309,17 @@ const CreateQuiz = ({ isCreate = true }) => {
     const vectoreStoreId = quiz?.aiFile?.vectorStoreId;
     const threadId = quiz?.aiFile?.threadId;
     const fileSize = quiz?.aiFile?.fileSize;
+    let questionsToAvoid = "";
+    quiz?.slides?.[currentQuizId] &&
+      Object.keys(quiz?.slides?.[currentQuizId])?.forEach((slideId, index) => {
+        questionsToAvoid += quiz?.slides?.[currentQuizId]?.[slideId]?.name;
+        if (index !== Object.keys(quiz?.slides?.[currentQuizId])?.length)
+          questionsToAvoid += ",";
+      });
+
+    const instructions = questionsToAvoid
+      ? `Please do not repeat any questions related to these topics  "${questionsToAvoid}"`
+      : "";
 
     if (fileId) {
       try {
@@ -319,7 +330,8 @@ const CreateQuiz = ({ isCreate = true }) => {
           vectoreStoreId,
           threadId,
           fileSize,
-          userId: user?.userId
+          userId: user?.userId,
+          instructions
         });
         const result = processDoucmentResponse(res?.data);
         if (!result) {
@@ -339,7 +351,7 @@ const CreateQuiz = ({ isCreate = true }) => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("userId", user?.userId);
-
+      formData.append("instructions", instructions);
       try {
         setDocumentSubmission(true);
         const res = await axiosInstance.post(
@@ -486,9 +498,11 @@ const CreateQuiz = ({ isCreate = true }) => {
               file={file}
               onFileSelect={onFileSelect}
             />
-            {isDocumentSubmitted && (
-              <div className="mt-6 text-green-300 font-medium text-xl">
-                Sit back and relax, it takes some time to generate quiz
+            {(isDocumentSubmitted || isSubmitted) && (
+              <div className="mt-8 text-gray-300 font-medium text-lg">
+                Sit back and relax. It takes some time to generate the quiz. In
+                the meantime, please do not refresh the page or navigate to
+                other pages.{" "}
               </div>
             )}
           </>

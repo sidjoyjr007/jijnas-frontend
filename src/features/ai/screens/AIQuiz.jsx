@@ -29,6 +29,12 @@ const AIQuiz = () => {
         value: { name: "", id: "", fileSize: "" }
       })
     );
+    dispatch(
+      setQuizDetails({
+        key: "aiText",
+        value: { level: "", prompt: "", label: "" }
+      })
+    );
   }, []);
 
   const onFileSelect = (file) => {
@@ -113,6 +119,14 @@ const AIQuiz = () => {
           jsonContent = JSON.parse(jsonContentMatch[1]);
         } else {
           console.error("No JSON content found");
+          setDocumentSubmission(false);
+          showNotification(
+            "Error",
+            "Not able to generate quiz, please try again later",
+            "alert"
+          );
+
+          return;
         }
         const quizzes = jsonContent?.quizzes || [];
         const currentQuizId = uuidV4();
@@ -176,9 +190,10 @@ const AIQuiz = () => {
           file={file}
           onFileSelect={onFileSelect}
         />
-        {isDocumentSubmitted && (
-          <div className="mt-4 text-gray-300 font-medium text-xl">
-            Sit back and relax, it takes some time to generate quiz
+        {(isDocumentSubmitted || isSubmitted) && (
+          <div className="mt-4 text-gray-300 font-medium text-lg">
+            Sit back and relax. It takes some time to generate the quiz. In the
+            meantime, please do not refresh the page or navigate to other pages.{" "}
           </div>
         )}
       </div>

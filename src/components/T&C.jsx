@@ -151,13 +151,13 @@ const TermsAndCondtions = () => {
           <li>
             <strong>Email:</strong> jijnasinka@gmail.com
           </li>
-          <li>
+          {/* <li>
             <strong>Phone:</strong> 7619410706
           </li>
           <li>
             <strong>Address:</strong> #8, 3rd cross Manujnath Layout Marathalli
             - 560037
-          </li>
+          </li> */}
         </ul>
       </section>
     </div>

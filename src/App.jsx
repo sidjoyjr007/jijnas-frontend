@@ -4,9 +4,9 @@ import {
   TrophyIcon,
   LightBulbIcon,
   CpuChipIcon,
-  CalendarDaysIcon,
   CurrencyDollarIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  QuestionMarkCircleIcon
 } from "@heroicons/react/24/outline";
 
 import { Outlet } from "react-router-dom";
@@ -37,6 +37,11 @@ const navigation = [
     name: "Tokens",
     href: "/app/tokens",
     icon: CurrencyDollarIcon
+  },
+  {
+    name: "Queries",
+    href: "/app/queries",
+    icon: QuestionMarkCircleIcon
   }
 ];
 

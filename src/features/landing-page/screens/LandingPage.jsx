@@ -1,7 +1,8 @@
 import {
   CalendarDaysIcon,
   LightBulbIcon,
-  EyeIcon
+  EyeIcon,
+  ArrowTrendingUpIcon
 } from "@heroicons/react/24/outline";
 import jijnasLogo from "../../../assets/logo.svg";
 import Button from "../../../components/Button";
@@ -123,10 +124,10 @@ const LandingPage = () => {
               className="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20"
             />
           </div>
-          <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-16">
+          <div className="mx-auto max-w-7xl px-6 pb-24 pt-6 sm:pb-40 lg:flex lg:px-8 lg:pt-16">
             <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-              <img alt="Logo" src={jijnasLogo} className="w-36 h-36" />
-              <h1 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+              <img alt="Logo" src={jijnasLogo} className="w-20 h-20" />
+              <h1 className="mt-6 text-4xl font-bold tracking-tight text-white sm:text-6xl">
                 From Manual to AI-Driven: Craft Quizzes and Host Events Like a
                 Pro!
               </h1>
@@ -135,10 +136,11 @@ const LandingPage = () => {
                 Effortlessly host quiz events and get reports to track and
                 analyze participant performance.
               </p>
-              <div className="mt-10 flex items-center gap-x-6 max-w-52">
+              <div className="mt-6 flex items-center gap-x-6 max-w-52">
                 <Button
                   label="Get Started"
                   handleSubmit={() => handleGetStarted()}
+                  icon={<ArrowTrendingUpIcon className="h-6 w-6" />}
                 />
               </div>
             </div>
@@ -309,9 +311,7 @@ const LandingPage = () => {
                 Terms and Conditions
               </Link>
             </p>
-            <p className="text-gray-300">
-              Contact us : jijnasinka@gmail.com/7619410706
-            </p>
+            <p className="text-gray-300">Contact us : jijnasinka@gmail.com</p>
           </div>
         </div>
       </footer>

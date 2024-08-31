@@ -32,6 +32,7 @@ const QuizEvent = lazy(() => import("./features/events/screens/QuizEvent"));
 const Results = lazy(() => import("./features/events/screens/Results"));
 const ErrorPage = lazy(() => import("./components/ErrorPage"));
 const TermsAndConditions = lazy(() => import("./components/T&C"));
+const Queries = lazy(() => import("./features/queries/screens/Queries"));
 
 import { signedup } from "./state/user.slice";
 import axiosInstance from "./utils/axios-config.utils";
@@ -124,6 +125,10 @@ const WrappedRoutes = () => {
         {
           path: "/app/tokens",
           element: <ProtectedLoader component={<Subscription />} />
+        },
+        {
+          path: "/app/queries",
+          element: <ProtectedLoader component={<Queries />} />
         }
       ]
     },
