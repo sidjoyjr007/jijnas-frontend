@@ -123,7 +123,7 @@ const WrappedRoutes = () => {
           element: <ProtectedLoader component={<Results />} />
         },
         {
-          path: "/app/tokens",
+          path: "/app/credits",
           element: <ProtectedLoader component={<Subscription />} />
         },
         {

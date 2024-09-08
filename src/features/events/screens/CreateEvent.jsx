@@ -3,6 +3,7 @@ import { v4 as uuidV4 } from "uuid";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { format, isBefore, addMinutes } from "date-fns";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { addQuizToQuizList } from "../../../state/quiz.slice";
 import SearchableSelect from "../../../components/SearchableSelect";
@@ -12,8 +13,8 @@ import { useNotification } from "../../../context/Notification.context";
 import { BounceLoader } from "react-spinners";
 import EmptyState from "../../../components/EmptyState";
 import { LightBulbIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
 import { localToUTC } from "../../../utils/local.utils";
+
 const CreateEvent = () => {
   const [options, setOptions] = useState([]);
   const [formData, setFormData] = useState({
@@ -35,6 +36,10 @@ const CreateEvent = () => {
   const [isQuizLoading, setQuizLoadingStatus] = useState(false);
   const [isSubmitted, setSubmissionstatus] = useState(false);
   const { showNotification } = useNotification();
+  const location = useLocation();
+  const { state } = location;
+
+  const { quizData } = state || {};
 
   useEffect(() => {
     (async () => {
@@ -57,11 +62,21 @@ const CreateEvent = () => {
   }, []);
 
   useEffect(() => {
+    const newOption = [...options, quizData];
+    setOptions(newOption);
+    setFormData({
+      quiz: {
+        value: quizData
+      }
+    });
+  }, [quizData]);
+
+  useEffect(() => {
     if (quiz?.quizList?.length) {
       const options = quiz?.quizList?.map((quiz) => {
         return { id: quiz?.quizId, label: quiz?.quizName };
       });
-      setOptions(options);
+      options?.length && setOptions(options);
     }
   }, [quiz]);
 
@@ -253,8 +268,8 @@ const CreateEvent = () => {
               <div className="text-sm font-medium text-gray-400">
                 We collect information such as email and name from users who
                 attend the quiz. If you need to collect any additional
-                information (e.g., student ID, employee ID), please add it to
-                the input field below.
+                information (e.g., student ID/employee ID), please add it to the
+                input field below.
               </div>
               <div className="mt-4">
                 <TextInput

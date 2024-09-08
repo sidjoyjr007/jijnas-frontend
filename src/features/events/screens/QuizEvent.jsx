@@ -34,6 +34,7 @@ import { localToUTC, utcToLocal } from "../../../utils/local.utils";
 import Countdown from "react-countdown";
 import { getEventStatus, STATUS } from "../../../utils/local.utils";
 import AlertDialog from "../../../components/AlertDilaog";
+import Tooltip from "../../../components/Tooltip";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -247,7 +248,14 @@ const QuizEvent = () => {
         questionsData?.[questionId]?.selectedOptions || [];
       const rightAnswers = questionsData?.[questionId]?.rightAnswers || [];
 
-      if (selectedOptions?.length === 0) return;
+      if (selectedOptions?.length === 0) {
+        showNotification(
+          "Warning",
+          "Please select option(s) before submitting",
+          "warning"
+        );
+        return;
+      }
 
       const isRight = selectedOptions?.every((option) =>
         rightAnswers?.includes(option)
@@ -441,15 +449,22 @@ const QuizEvent = () => {
                     <h3>
                       <DisclosureButton className="group relative flex w-full items-center justify-between py-6 text-left">
                         <div className=" flex gap-4 font-medium text-xl text-gray-500 group-data-[open]:text-indigo-600">
-                          <div>explanation</div>
-                          <div>
-                            {questionsData?.[questions?.currentQuestionId]
-                              ?.isSubmitted || quizfinished ? (
-                              <LockOpenIcon className="h-6 w-6" />
-                            ) : (
-                              <LockClosedIcon className="h-6 w-6" />
-                            )}
-                          </div>
+                          <Tooltip
+                            position="bottom"
+                            message="Explanation will be shown once participant submits answer"
+                          >
+                            <div className="flex gap-x-4">
+                              <div>explanation</div>
+                              <div>
+                                {questionsData?.[questions?.currentQuestionId]
+                                  ?.isSubmitted || quizfinished ? (
+                                  <LockOpenIcon className="h-6 w-6" />
+                                ) : (
+                                  <LockClosedIcon className="h-6 w-6" />
+                                )}
+                              </div>
+                            </div>
+                          </Tooltip>
                         </div>
                         {questionsData?.[questions?.currentQuestionId]
                           ?.isSubmitted && (

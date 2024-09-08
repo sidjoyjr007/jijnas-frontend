@@ -15,17 +15,12 @@ const FooterTab = ({ onRemoveQuizSlide }) => {
     dispatch(addQuiz({ currentQuizId }));
   };
 
-  return (
-    <div className="  h-12  flex items-center gap-2  hover:overflow-auto overflow-hidden">
-      <div className="pr-4">
-        <PlusIcon
-          className="block h-8 w-8 text-gray-400  cursor-pointer"
-          onClick={() => addNewSlide()}
-        />
-      </div>
-
-      {Object?.keys(quizSlides)?.map((slide) => {
-        return (
+  const getSlides = () => {
+    const slides = [];
+    Object?.keys(quizSlides || [])?.forEach((slide) => {
+      console.log(quizSlides?.[slide]?.deleted);
+      if (quizSlides?.[slide]?.deleted !== true) {
+        slides.push(
           <div
             className="group  relative flex gap-1 items-center group"
             key={slide}
@@ -52,7 +47,20 @@ const FooterTab = ({ onRemoveQuizSlide }) => {
             </button>
           </div>
         );
-      })}
+      }
+    });
+    return slides;
+  };
+
+  return (
+    <div className="  h-12  flex items-center gap-2  hover:overflow-auto overflow-hidden">
+      <div className="pr-4">
+        <PlusIcon
+          className="block h-8 w-8 text-gray-400  cursor-pointer"
+          onClick={() => addNewSlide()}
+        />
+      </div>
+      {getSlides()}
     </div>
   );
 };

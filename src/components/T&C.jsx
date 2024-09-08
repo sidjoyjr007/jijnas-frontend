@@ -46,10 +46,10 @@ const TermsAndCondtions = () => {
         <div className="mb-6">
           <h3 className="text-2xl font-semibold">Token Purchase and Usage</h3>
           <p className="text-lg mt-2">
-            QuizNex offers tokens that users must purchase to generate quizzes
-            via AI or to create and host quiz events. Tokens are non-refundable
+            QuizNex offers credits that users must purchase to generate quizzes
+            via AI or to create and host quiz events. Credits are non-refundable
             and must be used within the specified period, as indicated on the
-            purchase page. Misuse of tokens or attempts to exploit the system
+            purchase page. Misuse of credits or attempts to exploit the system
             will result in account suspension or termination.
           </p>
         </div>
@@ -71,7 +71,7 @@ const TermsAndCondtions = () => {
           <h3 className="text-2xl font-semibold">Information Collection</h3>
           <p className="text-lg mt-2">
             We collect information that you provide directly to us when you
-            create an account, purchase tokens, or use our services. This may
+            create an account, purchase credits, or use our services. This may
             include your name, email address, payment information, and any other
             information you choose to provide.
           </p>
@@ -126,7 +126,7 @@ const TermsAndCondtions = () => {
           <h3 className="text-2xl font-semibold">Cancellations</h3>
           <p className="text-lg mt-2">
             You may cancel your QuizNex account at any time. However, please
-            note that any unused tokens at the time of cancellation will not be
+            note that any unused credits at the time of cancellation will not be
             refunded.
           </p>
         </div>
@@ -135,7 +135,7 @@ const TermsAndCondtions = () => {
       <section className="mb-12">
         <h2 className="text-3xl font-semibold mb-4">4. Pricing</h2>
         <p className="text-lg mt-2">
-          All prices for tokens and services on QuizNex are listed in Indian
+          All prices for credits and services on QuizNex are listed in Indian
           Rupees (INR) / USD. Prices are subject to change without notice, but
           any changes will not affect orders that have already been placed.
         </p>
@@ -149,7 +149,7 @@ const TermsAndCondtions = () => {
         </p>
         <ul className="text-lg mt-2 list-disc list-inside">
           <li>
-            <strong>Email:</strong> jijnasinka@gmail.com
+            <strong>Email:</strong> services@quiznex.com
           </li>
           {/* <li>
             <strong>Phone:</strong> 7619410706

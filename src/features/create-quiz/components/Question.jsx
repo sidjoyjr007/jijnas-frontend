@@ -18,7 +18,7 @@ const Question = ({
             value={quizName}
             name="question-name"
             type="text"
-            placeholder="Enter Quiz Name"
+            placeholder="Enter Topic Name"
             onChange={(e) =>
               dispatch(
                 updateQuizName({
@@ -28,7 +28,7 @@ const Question = ({
                 })
               )
             }
-            label="Question Name"
+            label="Topic Name"
           />
         </div>
       </div>

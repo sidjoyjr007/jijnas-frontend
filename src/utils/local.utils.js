@@ -51,7 +51,7 @@ export const generatePromptForQuiz = (
   questionsToAvoid = undefined
 ) => {
   const context = questionsToAvoid
-    ? `and please do not repeat any questions related to these topics "${questionsToAvoid}" `
+    ? `and please do not repeat any questions related to these questions "${questionsToAvoid}" `
     : "";
   return `Generate a list of exactly ${quizNumber} multiple-choice quizzes with a difficulty level of '${level}' on the topic '${info}'. The response must strictly include exactly ${quizNumber} questions. If the response contains fewer or more questions, it will not be accepted. 
 ${context}

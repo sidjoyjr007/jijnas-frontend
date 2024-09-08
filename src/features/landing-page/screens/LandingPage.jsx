@@ -2,7 +2,8 @@ import {
   CalendarDaysIcon,
   LightBulbIcon,
   EyeIcon,
-  ArrowTrendingUpIcon
+  ArrowTrendingUpIcon,
+  PlayCircleIcon
 } from "@heroicons/react/24/outline";
 import jijnasLogo from "../../../assets/logo.svg";
 import Button from "../../../components/Button";
@@ -78,6 +79,13 @@ const LandingPage = () => {
     }
   };
 
+  const gotoDemoVideo = () => {
+    window.open(
+      "https://www.loom.com/share/6eb22d95e3c84008bf4884eb69479e26?sid=5755e470-fd18-4e23-89b6-db6602c3f1ef",
+      "_blank"
+    );
+  };
+
   return (
     <div className="bg-gray-900">
       <main>
@@ -136,11 +144,17 @@ const LandingPage = () => {
                 Effortlessly host quiz events and get reports to track and
                 analyze participant performance.
               </p>
-              <div className="mt-6 flex items-center gap-x-6 max-w-52">
+              <div className="mt-6 flex  gap-y-6  items-center gap-x-6 max-w-96">
                 <Button
                   label="Get Started"
                   handleSubmit={() => handleGetStarted()}
                   icon={<ArrowTrendingUpIcon className="h-6 w-6" />}
+                />
+                <Button
+                  label="Demo Video"
+                  handleSubmit={gotoDemoVideo}
+                  variant="secondary"
+                  icon={<PlayCircleIcon className="h-6 w-6" />}
                 />
               </div>
             </div>
@@ -311,7 +325,7 @@ const LandingPage = () => {
                 Terms and Conditions
               </Link>
             </p>
-            <p className="text-gray-300">Contact us : jijnasinka@gmail.com</p>
+            <p className="text-gray-300">Contact us : services@quiznex.com</p>
           </div>
         </div>
       </footer>

@@ -1,14 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  TransitionChild
-} from "@headlessui/react";
-import {
-  Bars3Icon,
-  XMarkIcon,
-  CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   LockClosedIcon,
@@ -24,19 +15,15 @@ import {
 } from "@headlessui/react";
 import { PlusIcon, MinusIcon, LightBulbIcon } from "@heroicons/react/20/solid";
 import FroalaEditorView from "react-froala-wysiwyg/FroalaEditorView";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Button from "./Button";
 import axiosInstance from "../utils/axios-config.utils";
 import { useNotification } from "../context/Notification.context";
 import EmptyState from "../components/EmptyState";
+import Tooltip from "./Tooltip";
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const PreviewAll = ({ preview = true }) => {
+const PreviewAll = () => {
   const { quizId } = useParams();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [quizName, setQuizName] = useState("");
   const [quizzes, setQuizzes] = useState({});
   const [questions, setQuesions] = useState({
@@ -192,7 +179,14 @@ const PreviewAll = ({ preview = true }) => {
   const handleAnswerSubmit = () => {
     const questionId = questions?.currentQuestionId;
     const selectedOptions = questionsData?.[questionId]?.selectedOptions || [];
-    if (selectedOptions?.length === 0) return;
+    if (selectedOptions?.length === 0) {
+      showNotification(
+        "Warning",
+        "Please select option(s) before submitting",
+        "warning"
+      );
+      return;
+    }
     setSubmission({
       ...questionsData,
       [questionId]: {
@@ -253,15 +247,22 @@ const PreviewAll = ({ preview = true }) => {
                     <h3>
                       <DisclosureButton className="group relative flex w-full items-center justify-between py-6 text-left">
                         <div className=" flex gap-4 font-medium text-xl text-gray-500 group-data-[open]:text-indigo-600">
-                          <div>explanation</div>
-                          <div>
-                            {questionsData?.[questions?.currentQuestionId]
-                              ?.isSubmitted ? (
-                              <LockOpenIcon className="h-6 w-6" />
-                            ) : (
-                              <LockClosedIcon className="h-6 w-6" />
-                            )}
-                          </div>
+                          <Tooltip
+                            position="bottom"
+                            message="Explanation will be shown once participant submits answer"
+                          >
+                            <div className="flex gap-x-4">
+                              <div>explanation</div>
+                              <div>
+                                {questionsData?.[questions?.currentQuestionId]
+                                  ?.isSubmitted ? (
+                                  <LockOpenIcon className="h-6 w-6" />
+                                ) : (
+                                  <LockClosedIcon className="h-6 w-6" />
+                                )}
+                              </div>
+                            </div>
+                          </Tooltip>
                         </div>
                         {questionsData?.[questions?.currentQuestionId]
                           ?.isSubmitted && (

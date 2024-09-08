@@ -12,24 +12,24 @@ const faqs = [
       "There are no restrictions on creating quizzes; you can create as many as you like."
   },
   {
-    question: "Can I try the application before purchasing tokens?",
+    question: "Can I try the application before purchasing credits?",
     answer:
-      "Yes, anyone who signs up for the first time will receive 60 tokens, which can be used to explore the application."
+      "Yes, anyone who signs up for the first time will receive 150 credits, which can be used to explore the application."
   },
   {
-    question: "What are tokens used for?",
+    question: "What are credits used for?",
     answer:
-      "Tokens are used to generate AI quizzes and host events. For more information on token requirements, please visit the 'Tokens' section."
+      "Credits are used to generate AI quizzes and host events. For more information on token requirements, please visit the 'Credits' section."
   },
   {
-    question: "How many tokens are required to create a quiz?",
+    question: "How many credits are required to create a quiz?",
     answer:
-      "No tokens are required to create quizzes manually, but generating quizzes through AI requires tokens. For more information on token requirements, please visit the 'Tokens' section."
+      "No credits are required to create quizzes manually, but generating quizzes through AI requires credits. For more information on token requirements, please visit the 'Credits' section."
   },
   {
-    question: "Are my tokens refundable?",
+    question: "Are my credits refundable?",
     answer:
-      "No, we follow a pay-as-you-go model. You can purchase tokens only when needed."
+      "No, we follow a pay-as-you-go model. You can purchase credits only when needed."
   },
   {
     question: "What are events?",
@@ -45,7 +45,7 @@ const Queries = () => {
         <h2 className="text-xl font-medium leading-10 tracking-tight text-white">
           Contact us
         </h2>
-        <div className="text-gray-300 space-x-2"> jijnasinka@gmail.com</div>
+        <div className="text-gray-300 space-x-2"> services@quiznex.com</div>
       </div>
       <div className="mx-auto max-w-4xl divide-y divide-white/10">
         <h2 className="text-xl font-bold leading-10 tracking-tight text-white">

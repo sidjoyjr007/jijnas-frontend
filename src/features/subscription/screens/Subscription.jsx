@@ -10,7 +10,7 @@ const Subscription = () => {
   const user = useSelector((state) => state.user);
   const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
-    tokens: { value: "250" }
+    tokens: { value: "150" }
   });
 
   const handleBlur = (key) => {
@@ -26,10 +26,10 @@ const Subscription = () => {
   const handleFormData = (key, value) => {
     let err = "";
     if (key === "tokens") {
-      if (!value) err = "Please enter number of tokens to purchase";
-      else if (parseInt(value) < 100 || parseInt(value) % 50 !== 0)
+      if (!value) err = "Please enter number of credits to purchase";
+      else if (parseInt(value) < 150 || parseInt(value) % 50 !== 0)
         err =
-          "You should purchase minimum 100 tokens and it should be multiple of 50 (e.g 100, 150, 200)";
+          "You should purchase minimum 150 credits and it should be multiple of 50 (e.g 100, 150, 200)";
     }
     setFormData({
       ...formData,
@@ -69,7 +69,7 @@ const Subscription = () => {
 
   const getPaymentLabel = () => {
     const { value, err } = formData?.tokens;
-    if (!value || err) return "Purchase Tokens";
+    if (!value || err) return "Purchase Credits";
     const { val, symbol } = getPrice(value);
     if (symbol === "$" && val < 0.5) {
       setFormData({
@@ -116,8 +116,8 @@ const Subscription = () => {
       accessorKey: "activity"
     },
     {
-      id: "tokens",
-      header: "Tokens Required",
+      id: "credits",
+      header: "Credits Required",
       accessorKey: "tokens"
     }
   ];
@@ -201,12 +201,12 @@ const Subscription = () => {
     MIN_FILE_TOKEN = ""
   } = user?.price?.products || {};
   const data = [
-    { activity: "Create and host quiz event", tokens: NORMAL },
-    { activity: "Generate AI quiz", tokens: AI },
-    { activity: "Document quiz generator (every 100KiB)", tokens: FILE_100KB },
+    { activity: "Creating quiz manually", tokens: 0 },
+    { activity: "Hosting quiz event", tokens: NORMAL },
+    { activity: "Generating text based AI quiz", tokens: AI },
     {
-      activity: "Minimum tokens for document quiz generator",
-      tokens: MIN_FILE_TOKEN
+      activity: `Document based quiz generator (Note: minimum ${MIN_FILE_TOKEN} credits required if document size is less than 500KiB)`,
+      tokens: `${FILE_100KB} credits per 100KiB`
     }
   ];
 
@@ -222,14 +222,14 @@ const Subscription = () => {
         {tokenPrice && (
           <>
             <div className="text-gray-400 font-medium text-base">
-              You are left with {user?.tokens} tokens
+              You are left with {user?.tokens} credits
             </div>
 
             <div className="flex flex-col gap-y-4">
               <div>
                 <TextInput
                   type="number"
-                  label="Get Tokens"
+                  label="Get Credits"
                   value={formData?.tokens?.value}
                   onChange={(e) => handleFormData("tokens", e.target.value)}
                   onBlur={() => handleBlur("tokens")}

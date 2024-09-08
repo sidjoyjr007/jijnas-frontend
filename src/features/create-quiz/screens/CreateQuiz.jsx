@@ -2,12 +2,19 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   PencilIcon,
   LightBulbIcon,
-  ArrowPathRoundedSquareIcon
+  TrashIcon,
+  PlusIcon
 } from "@heroicons/react/24/outline";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { v4 as uuidV4 } from "uuid";
-import { EyeIcon, DocumentTextIcon } from "@heroicons/react/20/solid";
+import {
+  EyeIcon,
+  DocumentTextIcon,
+  ArrowDownTrayIcon
+} from "@heroicons/react/20/solid";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 import {
   createNewQuiz,
@@ -30,6 +37,7 @@ import { localToUTC, generatePromptForQuiz } from "../../../utils/local.utils";
 import SidePanel from "../../../components/SidePanel";
 import AIQuizForm from "../../ai/components/AIQuizForm";
 import { addAIQuizzes, setQuizDetails } from "../../../state/quiz.slice";
+import Tooltip from "../../../components/Tooltip";
 
 const CreateQuiz = ({ isCreate = true }) => {
   const [savingQuiz, setQuizSavingStatus] = useState(false);
@@ -70,10 +78,16 @@ const CreateQuiz = ({ isCreate = true }) => {
   const explanationModel = currentSlide?.explanation || "";
   const quizName = currentSlide?.name || "";
 
-  const slidesLength =
-    (quiz?.slides?.[currentQuizId] &&
-      Object.keys(quiz?.slides?.[currentQuizId])?.length) ||
-    0;
+  const getSlidesLength = () => {
+    const slides = quiz?.slides?.[currentQuizId];
+    console.log(slides);
+    let slideLength = 0;
+    for (let slide in slides) {
+      if (!slides?.[slide]?.deleted) slideLength += 1;
+    }
+
+    return slideLength;
+  };
 
   const setModel = useCallback(
     (value, type) => {
@@ -109,21 +123,24 @@ const CreateQuiz = ({ isCreate = true }) => {
     const urls = [];
 
     setQuizSavingStatus(true);
+    let totalQuestions = slidesKeys?.length;
     slidesKeys?.forEach(async (key) => {
       const slide = slides?.[key];
       if (slide?.changed) {
+        totalQuestions = slide?.deleted ? totalQuestions - 1 : totalQuestions;
         const data = {
           quizId: currentQuizId,
           slideId: key,
           quizName: currentQuizName,
           userId: user?.userId,
           lastUpdated: localToUTC(new Date().valueOf()),
-          totalQuestions: slidesKeys?.length,
           options: slide?.options,
           questionName: slide?.name,
           question: slide?.question,
           explanation: slide?.explanation,
-          rightAnswers: slide?.rightAnswers
+          rightAnswers: slide?.rightAnswers,
+          changed: slide?.changed || false,
+          deleted: slide?.deleted || false
         };
 
         urls.push({ url: "/api/v1/quiz/save", data });
@@ -131,7 +148,7 @@ const CreateQuiz = ({ isCreate = true }) => {
     });
     if (urls?.length) {
       const requests = urls.map(({ url, data }) => {
-        return axiosInstance.post(url, data);
+        return axiosInstance.post(url, { ...data, totalQuestions });
       });
       try {
         Promise.all(requests)
@@ -168,7 +185,7 @@ const CreateQuiz = ({ isCreate = true }) => {
     let questionsToAvoid = "";
     quiz?.slides?.[currentQuizId] &&
       Object.keys(quiz?.slides?.[currentQuizId])?.forEach((slideId, index) => {
-        questionsToAvoid += quiz?.slides?.[currentQuizId]?.[slideId]?.name;
+        questionsToAvoid += quiz?.slides?.[currentQuizId]?.[slideId]?.question;
         if (index !== Object.keys(quiz?.slides?.[currentQuizId])?.length)
           questionsToAvoid += ",";
       });
@@ -312,13 +329,13 @@ const CreateQuiz = ({ isCreate = true }) => {
     let questionsToAvoid = "";
     quiz?.slides?.[currentQuizId] &&
       Object.keys(quiz?.slides?.[currentQuizId])?.forEach((slideId, index) => {
-        questionsToAvoid += quiz?.slides?.[currentQuizId]?.[slideId]?.name;
+        questionsToAvoid += quiz?.slides?.[currentQuizId]?.[slideId]?.question;
         if (index !== Object.keys(quiz?.slides?.[currentQuizId])?.length)
           questionsToAvoid += ",";
       });
 
     const instructions = questionsToAvoid
-      ? `Please do not repeat any questions related to these topics  "${questionsToAvoid}"`
+      ? `Please do not repeat any questions related to these questions  "${questionsToAvoid}"`
       : "";
 
     if (fileId) {
@@ -377,13 +394,105 @@ const CreateQuiz = ({ isCreate = true }) => {
     }
   };
 
+  const generatePDF = async (jsonData) => {
+    // Create HTML content from JSON data
+    const createHtmlContent = () => {
+      const data = Object.values(jsonData);
+      return data
+        .map(
+          (item, index) => `
+      <div class="content-block" style="page-break-inside: avoid; margin-bottom: 10px; padding-bottom: 10px;">
+        <div style="font-size: 14pt; font-weight: bold; margin-bottom: 5px; display: flex; flex-wrap: wrap;">
+          <span>${index + 1}:</span>
+          <span style="font-weight: normal; margin-left: 5px;">${
+            item.question || ""
+          }</span>
+        </div>
+        <div style="margin-top: 5px; page-break-inside: avoid;">
+          ${
+            item.options
+              ? `<ul style="padding-left: 20px; margin: 0; line-height: 1.5;">
+            ${item.options
+              .map(
+                (option, optionIndex) => `
+              <li style="margin-bottom: 5px; font-size: 12pt; page-break-inside: avoid;">
+                <span>
+                  ${String.fromCharCode(97 + optionIndex)}. ${option.value}
+                </span>
+              </li>`
+              )
+              .join("")}
+          </ul>`
+              : ""
+          }
+        </div>
+      </div>
+    `
+        )
+        .join("");
+    };
+
+    // Create a container for the HTML content
+    const htmlContent = createHtmlContent();
+    const container = document.createElement("div");
+    container.innerHTML = htmlContent;
+    container.style.width = "210mm"; // A4 width
+    container.style.padding = "10mm";
+    container.style.fontFamily = "Arial, sans-serif"; // General font styling
+
+    // Remove specific elements by attribute
+    container
+      .querySelectorAll('[data-f-id="pbf"]')
+      .forEach((el) => el.remove());
+
+    document.body.appendChild(container);
+
+    // Capture HTML content as canvas
+    try {
+      const canvas = await html2canvas(container, {
+        useCORS: true, // Enable cross-origin images
+        scale: 2 // Improve resolution
+      });
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+
+      // Create PDF
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageHeight = pdf.internal.pageSize.height;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Handle content overflow and pagination
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save PDF
+      pdf.save(`${quiz?.currentQuizName}.pdf`);
+    } catch (err) {
+      console.error("PDF generation error:", err);
+    } finally {
+      // Cleanup
+      document.body.removeChild(container);
+    }
+  };
+
   return (
     <div className="  rounded-lg  h-full overflow-auto">
-      {slidesLength ? (
+      {getSlidesLength() ? (
         <>
           <div className="bg-gray-700/10">
             <div className="flex justify-between  flex-wrap border-b border-white/5 p-6">
-              <div className="flex gap-2  ">
+              <div className="flex gap-2 items-center ">
                 <div
                   onBlur={(e) => {
                     dispatch(
@@ -399,12 +508,21 @@ const CreateQuiz = ({ isCreate = true }) => {
                 >
                   {currentQuizName}
                 </div>
-                <PencilIcon
-                  onClick={() => quiztitleRef.current.focus()}
-                  className="h-4 w-4 cursor-pointer text-gray-400"
-                />
+                <Tooltip position="bottom" message="Edit question name">
+                  <PencilIcon
+                    onClick={() => quiztitleRef.current.focus()}
+                    className="h-4 w-4 cursor-pointer text-gray-400"
+                  />
+                </Tooltip>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                <Tooltip position="bottom" message="Download quiz as PDF">
+                  <ArrowDownTrayIcon
+                    onClick={() => generatePDF(quiz?.slides?.[currentQuizId])}
+                    className="cursor-pointer h-6 w-6 text-gray-300"
+                  />
+                </Tooltip>
+
                 <Button
                   label="Preview"
                   variant="secondary"
@@ -435,6 +553,14 @@ const CreateQuiz = ({ isCreate = true }) => {
               <div className="mt-6 mb-4 flex items-center justify-center lg:items-center lg:justify-center">
                 <div className="xl:px-20 2xl:px-72 h-full  px-4 py-6  ">
                   <div className=" bg-gray-600/10 border border-white/5 rounded-md  px-4 py-4 flex flex-col  gap-y-4">
+                    <div className="flex justify-end">
+                      <Tooltip position="bottom" message="Delete this question">
+                        <TrashIcon
+                          className="h-6 w-6 text-gray-300 cursor-pointer"
+                          onClick={() => onRemoveQuizSlide(currentSlideId)}
+                        />
+                      </Tooltip>
+                    </div>
                     <Question
                       dispatch={dispatch}
                       updateQuizName={updateQuizName}
@@ -478,8 +604,8 @@ const CreateQuiz = ({ isCreate = true }) => {
           handleSubmit={() => setOpen(true)}
           label={
             <div className="flex gap-x-2">
-              <ArrowPathRoundedSquareIcon className="h-6 w-6" />
-              <span>Generate Quiz</span>{" "}
+              <PlusIcon className="h-6 w-6" />
+              <span>Add More Quiz</span>{" "}
             </div>
           }
         />

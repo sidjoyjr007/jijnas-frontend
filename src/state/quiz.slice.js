@@ -142,23 +142,53 @@ const quizSlice = createSlice({
     },
     removeQuiz: (state, action) => {
       const { currentQuizId, slideId, currentSlideId } = action?.payload;
-      const { [slideId]: _, ...rest } = state?.slides?.[currentQuizId];
+      // const { [slideId]: _, ...rest } = state?.slides?.[currentQuizId];
 
       let newSlideId = currentSlideId;
 
-      if (currentSlideId === slideId) {
-        const slides =
-          (state?.slides?.[currentQuizId] &&
-            Object.keys(state?.slides?.[currentQuizId])) ||
-          [];
-        if (slides?.length) {
-          const findSlideIndex = slides?.findIndex((id) => id === slideId);
-          if (slides[findSlideIndex - 1]) {
-            newSlideId = slides[findSlideIndex - 1];
-          } else if (slides[findSlideIndex + 1]) {
-            newSlideId = slides[findSlideIndex + 1];
-          } else {
-            newSlideId = "";
+      const slides =
+        (state?.slides?.[currentQuizId] &&
+          Object.keys(state?.slides?.[currentQuizId])) ||
+        [];
+      if (slides?.length) {
+        const findSlideIndex = slides?.findIndex((id) => id === slideId);
+        const prevSlideId = slides[findSlideIndex - 1];
+        const nextSlideId = slides[findSlideIndex + 1];
+        if (
+          prevSlideId &&
+          !state?.slides?.[currentQuizId]?.[prevSlideId]?.deleted
+        ) {
+          newSlideId = slides[findSlideIndex - 1];
+        } else if (
+          nextSlideId &&
+          !state?.slides?.[currentQuizId]?.[nextSlideId]?.deleted
+        ) {
+          newSlideId = slides[findSlideIndex + 1];
+        } else {
+          let count = 1;
+          let prevSlideId = slides[findSlideIndex - count];
+          let nextSlideId = slides[findSlideIndex + count];
+
+          while (
+            (prevSlideId === undefined || nextSlideId === undefined) &&
+            !(prevSlideId === undefined && nextSlideId === undefined)
+          ) {
+            if (
+              prevSlideId &&
+              state?.slides?.[currentQuizId]?.[prevSlideId]?.deleted !== true
+            ) {
+              newSlideId = prevSlideId;
+              break;
+            } else if (
+              nextSlideId &&
+              state?.slides?.[currentQuizId]?.[nextSlideId]?.deleted !== true
+            ) {
+              newSlideId = nextSlideId;
+              break;
+            }
+            count += 1;
+            prevSlideId = slides[findSlideIndex - count];
+            nextSlideId = slides[findSlideIndex + count];
           }
         }
       }
@@ -167,7 +197,12 @@ const quizSlice = createSlice({
         ...state,
         slides: {
           [currentQuizId]: {
-            ...rest
+            ...state?.slides?.[currentQuizId],
+            [slideId]: {
+              ...state?.slides?.[currentQuizId]?.[slideId],
+              changed: true,
+              deleted: true
+            }
           }
         },
         currentSlideId: newSlideId

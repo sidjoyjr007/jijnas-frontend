@@ -4,7 +4,8 @@ import {
   EllipsisHorizontalIcon,
   EyeIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
+  TrophyIcon
 } from "@heroicons/react/20/solid";
 import moment from "moment";
 import { useNavigate, Link } from "react-router-dom";
@@ -101,6 +102,17 @@ const QuizCard = ({ quizList = [], setRefreshStatus }) => {
                       className="block px-3 py-1 text-sm leading-6 text-gray-400 data-[focus]:bg-white/15"
                     >
                       {getMenuItem(EyeIcon, "Preview")}
+                    </Link>
+                  </MenuItem>
+                  <MenuItem>
+                    <Link
+                      to="../events/create-event"
+                      state={{
+                        quizData: { id: quiz?.quizId, label: quiz?.quizName }
+                      }}
+                      className="block px-3 py-1 text-sm leading-6 text-gray-400 data-[focus]:bg-white/15"
+                    >
+                      {getMenuItem(TrophyIcon, "Host Event")}
                     </Link>
                   </MenuItem>
                   <MenuItem>

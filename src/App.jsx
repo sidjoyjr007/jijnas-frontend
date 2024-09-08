@@ -34,8 +34,8 @@ const navigation = [
   },
   { name: "Events", href: "/app/events", icon: TrophyIcon },
   {
-    name: "Tokens",
-    href: "/app/tokens",
+    name: "Credits",
+    href: "/app/credits",
     icon: CurrencyDollarIcon
   },
   {
